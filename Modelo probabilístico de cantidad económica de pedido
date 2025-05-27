@@ -1,0 +1,114 @@
+#Modelo probabilístico de cantidad económica de pedido
+import math as m
+import sympy as sp
+
+# Parámetros
+K = 100  # Costo de preparación de pedido
+h = 2    # Costo de almacenamiento
+p = 10   # Costo de faltante por unidad de inventario
+D = 1000 # Demanda
+fx = 1 / 100
+denominador_fx = 100
+Ex = 50 
+
+# Calcular y1 y y2
+y1 = m.sqrt(2 * D * (K + p * Ex) / h)
+y2 = (p * D) / h
+
+# Condición para continuar con los cálculos
+if y2 >= y1:
+    # Definir la variable x y el parámetro R
+    x, R, v = sp.symbols('x R v')
+
+    # Definir los límites de integración
+    limite_inferior = R
+
+    # Definir la integral simbólica S
+    S = sp.integrate((x - R) * fx, (x, limite_inferior, denominador_fx))
+
+    # Simplificar el resultado para obtener una ecuación cuadrática en R
+    S_simplificada = sp.simplify(S)
+
+    # Calcular yi
+    yi = sp.sqrt((2 * D * (K + p * v)) / h)  # Aquí 'v' se mantiene como variable
+
+    # Calcular la nueva yi1
+    yi1 = sp.symbols('yi1')  # Definir yi1 como símbolo
+
+    # Calcular la integral
+    z = denominador_fx
+    integral_result = sp.integrate(fx, (x, R, z))
+
+    # Resolver la ecuación
+    ecuacion = sp.Eq(integral_result, (h * yi1) / (p * D))
+
+    # Despejar R
+    R_resultado = sp.solve(ecuacion, R)[0]
+
+    # Mostrar el resultado
+
+    yn1 = m.sqrt(2*K*D/h)
+
+    # Reemplazar yi1 con yn1 en la ecuación de R
+    nueva_ecuacion = ecuacion.subs(yi1, yn1)
+
+    # Resolver para obtener el nuevo R
+    nuevo_R = sp.solve(nueva_ecuacion, R)[0]
+
+    #ITERACION 
+     # Reemplazar R en S_simplificada con nuevo_R
+    S_final = S_simplificada.subs(R, nuevo_R)
+
+    y_it1= yi.subs(v,S_final)
+
+    nueva_ecuacion2 = ecuacion.subs(yi1,y_it1)
+    nuevo_R2 = sp.solve(nueva_ecuacion2, R)[0]
+    
+    S_final2 = S_simplificada.subs(R, nuevo_R2)
+
+    y_it2= yi.subs(v,S_final2)
+
+    nueva_ecuacion3 = ecuacion.subs(yi1,y_it2)
+    nuevo_R3 = sp.solve(nueva_ecuacion3, R)[0]
+
+    S_final3 = S_simplificada.subs(R, nuevo_R3)
+
+    y_it3= yi.subs(v,S_final3)
+
+    nueva_ecuacion4 = ecuacion.subs(yi1,y_it3)
+    nuevo_R4 = sp.solve(nueva_ecuacion4, R)[0]
+
+    S_final4 = S_simplificada.subs(R, nuevo_R4)
+  
+    y_it4= yi.subs(v,S_final4)
+
+    nueva_ecuacion5 = ecuacion.subs(yi1,y_it4)
+    nuevo_R5 = sp.solve(nueva_ecuacion5, R)[0]
+
+    S_final5 = S_simplificada.subs(R, nuevo_R5)
+
+    y_it5= yi.subs(v,S_final5)
+    print(f"yi_1:   {y_it5}")
+   
+    nueva_ecuacion6 = ecuacion.subs(yi1,y_it5)
+    nuevo_R6 = sp.solve(nueva_ecuacion6, R)[0]
+    print(f"Ri_1 =  {nuevo_R6}")
+    
+    S_final6 = S_simplificada.subs(R, nuevo_R6)
+   
+    y_it6= yi.subs(v,S_final6)
+    print(f"yi_2:   {y_it6}")
+
+    nueva_ecuacion7 = ecuacion.subs(yi1,y_it6)
+    nuevo_R7 = sp.solve(nueva_ecuacion7, R)[0]
+    print(f"Ri_2 =  {nuevo_R7}")
+
+    #Resultado 
+    print("")
+    print("POLITICA OPTIMA DE PEDIDO")
+    print(f"Se debe pedir aproximadamente {y_it6:2f} unidades, siempre que el nivel de existencias baje a {nuevo_R7:2f} ")
+    
+   
+else:
+    print("No cumplió la restricción para seguir con el cálculo.")
+
