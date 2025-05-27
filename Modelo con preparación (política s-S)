@@ -1,0 +1,85 @@
+#Modelo con preparación (política s-S)
+
+import sympy as sp
+
+# Definición de constantes
+D = sp.symbols('D')  # Definir D como símbolo
+h = 2.39 # COSTO DE ALMACENAMIENTO
+p = 10  #COSTO DE PENALIZACION 
+c = 8.13  #COSTO DE COMPRA
+demanda = 28
+K = 23.7  # COSTO DE PREPARACION DE PEDIDO
+X = 16   # INVENTARIO INICIAL
+
+S = f= ((p-c)/(p+h))*demanda
+
+# Parte 1: Definir la variable y
+y = sp.symbols('y')
+
+# Calcular la integral de 0 a y de (y - D) / 10
+integral1 = sp.integrate((y - D) / demanda, (D, 0, y))
+
+# Calcular la integral de y a 10 de (D - y) / 10
+integral2 = sp.integrate((D - y) / demanda, (D, y, demanda))
+
+# Parte 2 y Parte 3 multiplicadas por sus coeficientes
+resultado1 = c * (y - 0) + h * integral1 + p * integral2
+
+# Simplificar el resultado
+resultado1_simplificado = sp.simplify(resultado1)
+print("Resultado de la integral en forma cuadrática (Ecuación 1):", resultado1_simplificado)
+
+# Parte 2: Definir la variable v
+v = sp.symbols('v')
+
+# Calcular la integral de 0 a v de (v - D) / 10
+integral1_v = sp.integrate((v - D) / demanda, (D, 0, v))
+
+# Calcular la integral de v a 10 de (D - v) / 10
+integral2_v = sp.integrate((D - v) / demanda, (D, v, demanda))
+
+# Parte 2 y Parte 3 multiplicadas por sus coeficientes para v
+resultado2 = c * (v - 0) + h * integral1_v + p * integral2_v
+
+# Simplificar el resultado
+resultado2_simplificado = sp.simplify(resultado2)
+print("Resultado de la integral en forma cuadrática (Ecuación 2):", resultado2_simplificado)
+
+# Sumar K a la ecuación 2 y reemplazar v por S=8
+resultado3 = resultado2_simplificado.subs(v, S) + K  # Reemplazar v por S y sumar K
+
+# Igualar la ecuación 1 y la ecuación 3
+ecuacion = sp.Eq(resultado1_simplificado, resultado3)
+
+# Reorganizar para la forma cuadrática en y
+forma_cuadratica = sp.collect(ecuacion.lhs - ecuacion.rhs, y)
+
+# Extraer coeficientes de la forma ax^2 + bx + c = 0
+coeficientes = sp.poly(forma_cuadratica, y).all_coeffs()
+a, b, c = coeficientes[0], coeficientes[1], coeficientes[2]
+
+# Resolver la ecuación cuadrática
+soluciones_y = sp.solve(sp.Eq(a * y**2 + b * y + c, 0), y)
+
+# Definir nombres para las soluciones
+sol1 = soluciones_y[0]
+sol2 = soluciones_y[1]
+
+# Lógica para descartar soluciones mayores que K
+valores_validos = [sol for sol in [sol1, sol2] if sol <= K]
+
+# Lógica para manejar la solución restante
+if not valores_validos:
+    resultado_final = "NO HAY SOLUCIONES VÁLIDAS"
+else:
+    solucion_restante = valores_validos[0]  # Tomar la solución restante
+    if solucion_restante < 0:
+        resultado_final = "NO REALIZAR PEDIDO"
+    elif solucion_restante < X:
+        cantidad_a_pedir = S - X
+        resultado_final = f"LA CANTIDAD A PEDIR ES: {cantidad_a_pedir}"
+    else:
+        resultado_final = "NO REALIZAR PEDIDO"
+
+# Mostrar el resultado final
+print(resultado_final)
