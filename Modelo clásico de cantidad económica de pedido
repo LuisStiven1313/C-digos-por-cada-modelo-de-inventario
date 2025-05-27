@@ -1,0 +1,69 @@
+
+# Función para calcular la cantidad económica de pedido (EOQ)
+def calcular_eoq(K, D, h):
+    """
+    Calcula la cantidad económica de pedido (EOQ).
+    
+    Parámetros:
+    K (float): Costo de pedido.
+    D (float): Demanda mensual.
+    h (float): Costo de mantenimiento por unidad por mes.
+    
+    Retorna:
+    float: Cantidad económica de pedido (EOQ).
+    """
+    return math.sqrt((2 * K * D) / h)
+
+# Función para calcular el costo total mensual
+def calcular_costo_total_mensual(K, D, h, Q):
+    """
+    Calcula el costo total mensual.
+    
+    Parámetros:
+    K (float): Costo de pedido.
+    D (float): Demanda mensual.
+    h (float): Costo de mantenimiento por unidad por mes.
+    Q (float): Cantidad económica de pedido (EOQ).
+    
+    Retorna:
+    float: Costo total mensual.
+    """
+    costo_total_mensual = K /((math.sqrt((2 * K * D) / h))/D) + h * (math.sqrt((2 * K * D) / h))/2
+    
+    return costo_total_mensual
+
+# Función para calcular el punto de reorden
+def calcular_punto_reorden(D, L):
+    """
+    Calcula el punto de reorden.
+    
+    Parámetros:
+    D (float): Demanda mensual.
+    L (float): Tiempo de entrega en meses.
+    
+    Retorna:
+    float: Punto de reorden.
+    """
+    to = (math.sqrt((2 * K * D) / h))/D 
+    n = math.floor(L / to)
+    Le = L - n*to
+    LeD = Le * D
+    return LeD
+
+# Parámetros del modelo
+D = 832   # Demanda mensual 
+K = 69.82      # Costo de pedido
+h = 2.96    # Costo de mantenimiento por unidad por mes 
+L = 5     # Tiempo de entrega en meses
+
+# Cálculo del EOQ
+eoq = calcular_eoq(K, D, h)
+print(f"Cantidad económica de pedido (EOQ): {eoq:.2f} unidades")
+
+# Cálculo del costo total mensual
+costo_total_mensual = calcular_costo_total_mensual(K, D, h, eoq)
+print(f"Costo total mensual: ${costo_total_mensual:.2f}")
+
+# Cálculo del punto de reorden
+punto_reorden = calcular_punto_reorden(D, L)
+print(f"Punto de reorden: {punto_reorden:.2f} unidades")
