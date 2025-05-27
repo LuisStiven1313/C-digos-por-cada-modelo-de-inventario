@@ -1,0 +1,60 @@
+Modelo con preparación
+import numpy as np
+
+## Datos del problema
+D = [3,2,4]
+K = [3,7,6]
+h = [1,3,2]
+x_inicial = 1
+c_pro1 = 10
+c_pro2 = 20
+unidades_min = 3
+
+max = sum(D)
+
+## número de etapas n
+n = len(D)
+
+## Función de costo marginal de producción
+def c_i(p_i):
+  if p_i <= unidades_min:
+    return c_pro1 * p_i
+  else:
+    return  (c_pro1 + c_pro2) + c_pro2 * (p_i - 3)
+
+## Función de costo de producción
+def C_i(p_i, i):
+  if p_i == 0:
+    return 0
+  else:
+    return K[i] + c_i(p_i)
+
+## Inicializar las tablas de costos y las soluciones óptimas
+f = np.full((n + 1,max),np.inf)  ## costos mínimos
+x_opt = np.zeros((n + 1,max), dtype = int)  ## Inventarios óptimos
+
+## Condición inicial  n + 1
+f[n, :] = 0  # Costo mínimo en el último periodo es 0
+
+## Programación dinámica en reversa
+for i in range(n - 1, -1, -1):
+  for x in range(max):
+    for p in range(max):
+      x_next = x + p - D[i]
+      if 0 <= x_next < max:
+        costo = C_i(p,i) + h[i] * x + f[i + 1, x_next]
+        if costo < f[i,x]:
+          f[i , x] = costo
+          x_opt[i, x] = p
+
+## Reconstruir la solución óptima
+p_opt = []
+x = x_inicial
+for i in range(n):
+  p_opt.append(x_opt[i,x])
+  x = x + x_opt[i , x] - D[i]
+
+## Resultados
+for i in range(1, n + 1):
+  print(f"En el periodo {i} pedir {p_opt[i - 1]} unidades")
+print(f"El costo mínimo de inventario MRP es {f[0,x_inicial]}")
