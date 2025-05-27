@@ -1,0 +1,28 @@
+# Modelos de varios periodos
+
+# Definimos los parámetros
+x = 100 #Inventario inicial
+D= 10  #Demanda mas alta del intervalo
+p = 3    #costo de penalizacion
+r = 2    # ingreso por unidad
+c = 1    # costo de compra (o de produccion) por unidad
+h = 0.1  # costo de almacenamiento 
+alpha = 0.8  # factor de descuento por periodo
+
+# Calculamos el valor 
+numerador = p + (1 + alpha) * (r - c)
+denominador = p + h + (1 - alpha) * r
+resultado_integral = numerador / denominador
+
+resultado_integral * D 
+
+print(f"y*= {resultado_integral * D :.2f}")
+
+# Decisión de pedido
+if x < resultado_integral * D:
+    pedido = resultado_integral * D - x
+
+    print(f"Se debe pedir {pedido} unidades.")
+else:
+    print("No es necesario realizar un pedido.")
+
