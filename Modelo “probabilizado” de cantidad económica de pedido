@@ -1,0 +1,31 @@
+#Modelo “probabilizado” de cantidad económica de pedido
+import scipy.stats as stats
+import math
+
+def calcular_eoq_probabilizado(D, sigma, L, alpha):
+    # Media de la demanda durante el tiempo de entrega
+    mu_L = D * L
+    
+    # Desviación estándar de la demanda durante el tiempo de entrega
+    sigma_L = sigma * math.sqrt(L)
+    
+    # Calcular el valor Z para el nivel de servicio deseado
+    Z = stats.norm.ppf(1 - alpha)
+    
+    # Calcular el stock de seguridad
+    B = Z * sigma_L
+    
+    # Punto de reorden
+    R = mu_L + B
+    
+    return R, B
+
+# Ejemplo de uso
+D = 176  # Demanda diaria promedio (unidades por día)
+sigma = 29  # Desviación estándar de la demanda diaria (unidades por día)
+L =   1    # Tiempo de entrega (días)
+alpha = 0.02  # Probabilidad máxima admisible de agotamiento de existencias
+
+R, B = calcular_eoq_probabilizado(D, sigma, L, alpha)
+print(f"Punto de reorden (R): {R:.2f} unidades")
+print(f"Stock de seguridad (B): {B:.2f} unidades")
