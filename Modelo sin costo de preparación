@@ -1,0 +1,58 @@
+#Modelo sin costo de preparación
+import numpy as np
+
+# Demand for each period
+demand = np.array([100, 190, 210, 160])
+
+# Normal production capacities per period
+normal_capacity = np.array([90, 100, 120, 110])
+
+# Overtime production capacities per period
+overtime_capacity = np.array([50, 60, 80, 70])
+
+# Costs per unit
+normal_cost = 6.0
+overtime_cost = 9.0
+storage_cost = 0.10  # Monthly storage cost per unit
+
+# Number of periods
+num_periods = len(demand)
+
+# Initialize cost and production matrices
+total_cost = 0
+production_schedule = np.zeros((num_periods, 2), dtype=int)  # [Normal, Overtime] production
+stored_units = np.zeros(num_periods, dtype=int)
+
+# Production planning
+for i in range(num_periods):
+    if i == 0:
+        # Produce in normal time
+        production_schedule[i, 0] = normal_capacity[i]
+        remaining_demand = demand[i] - normal_capacity[i]
+        if remaining_demand > 0:
+            # Produce remaining demand in overtime
+            production_schedule[i, 1] = remaining_demand
+        stored_units[i] = normal_capacity[i] + production_schedule[i, 1] - demand[i]
+    else:
+        # Produce in normal time
+        if stored_units[i-1] < demand[i]:
+            required_production = demand[i] - stored_units[i-1]
+            production_schedule[i, 0] = min(required_production, normal_capacity[i])
+            remaining_demand = required_production - production_schedule[i, 0]
+            if remaining_demand > 0:
+                # Produce remaining demand in overtime
+                production_schedule[i, 1] = remaining_demand
+        stored_units[i] = production_schedule[i, 0] + production_schedule[i, 1] + stored_units[i-1] - demand[i]
+
+    # Compute total cost
+    normal_production_cost = production_schedule[i, 0] * normal_cost
+    overtime_production_cost = production_schedule[i, 1] * overtime_cost
+    storage_cost_total = stored_units[i] * storage_cost
+    total_cost += normal_production_cost + overtime_production_cost + storage_cost_total
+
+# Output results
+print("Programa de producción óptimo:")
+for i in range(num_periods):
+    print(f"Periodo {i+1}: Producir {production_schedule[i, 0]} unidades en tiempo normal y {production_schedule[i, 1]} unidades en tiempo extra")
+print(f"Costo total de producción y almacenamiento: ${total_cost:.2f}")
+
