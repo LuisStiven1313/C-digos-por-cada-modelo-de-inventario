@@ -1,0 +1,79 @@
+Modelo sin preparación
+# MODELO PROBABILISTICO SIN COSTO DE PREPARACION ( DISTRIBUCION DISCRETA)
+
+import numpy as np
+
+c = 30  # COSTO DE COMPRA
+h = 25   # COSTO DE ALMACENAMIENTO
+p = 45   # COSTO DE PENALIZACION
+
+if p < c:
+    print("No se puede continuar el cálculo porque el costo de compra del artículo es mayor que la penalización por no suministrarlo.")
+else:
+    # RELACION CRITICA
+    RC = (p - c) / (p + h)
+
+# Función para calcular la distribución acumulada
+def calcular_distribucion_acumulada(valores, probabilidades, RC):
+    # Asegurarse de que las probabilidades sumen 1
+    if not np.isclose(sum(probabilidades), 1):
+        raise ValueError("Las probabilidades deben sumar 1.")
+    
+    distribucion_acumulada = np.cumsum(probabilidades)
+    
+  
+    # Determinar el valor más alto en el rango donde se ubica RC
+    for i, acumulada in enumerate(distribucion_acumulada):
+        if RC <= acumulada:
+            # Retornar el valor más alto correspondiente
+            return valores[i]
+
+    # Si RC es mayor que la acumulada total, retornar None
+    return None
+
+# Introducir valores y probabilidades
+Distrib_discreta = [200, 220, 300, 320, 340]  # Valores de la variable aleatoria
+FD = [0.1, 0.2, 0.4, 0.2, 0.1]  # Probabilidades asociadas a cada valor
+
+# Calcular y mostrar la distribución acumulada
+valor_mas_alto = calcular_distribucion_acumulada(Distrib_discreta, FD, RC)
+
+# Mostrar el resultado
+if valor_mas_alto is not None:
+    print(f"De acuerdo a la funcion de distribucion de probabilidades discreta la cantidad de pedido es: {valor_mas_alto}")
+else:
+    print(f"RC = {RC} es mayor que la acumulada total.")
+
+
+
+
+# MODELO PROBABILISTICO SIN COSTO DE PREPARACION (DISTRIBUCION CONTINUA)
+
+import numpy as np
+import scipy.stats as stats
+
+# DISTRIBUCION CONTINUA
+
+c = 30  # COSTO DE COMPRA
+h = 25   # COSTO DE ALMACENAMIENTO
+p = 45   # COSTO DE PENALIZACION
+D = 300  # DEMANDA PROMEDIO
+sigma = 20  # DESVIACION ESTANDAR 
+
+# VERIFICAR CONDICIÓN
+if p < c:
+    print("No se puede continuar el cálculo porque el costo de compra del artículo es mayor que la penalización por no suministrarlo.")
+else:
+    # RELACION CRITICA
+    RC = (p - c) / (p + h)
+
+    # CALCULO TABLA DE DISTRIBUCION NORMAL
+    if 0 < RC < 1:
+        # Calcular el valor z correspondiente al nivel de servicio
+        z = stats.norm.ppf(RC)
+
+        # Calcular y1
+        y1 = z * sigma + D
+        print(f"La cantidad economica de pedido es: {y1}")
+
+
