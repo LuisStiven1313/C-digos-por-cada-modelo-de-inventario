@@ -1,0 +1,47 @@
+#Cantidad económica de pedido de varios artículos con limitación de almacén
+import numpy as np
+def inv_restriccion_area(k,D,h,a,A,error = 0.05):
+  y_sub = []
+  for i in range(0,n):
+    yi= ((2*k[i]*D[i])/(h[i]))**0.5
+    y_sub.append(yi)
+  area_ocupada = np.dot(a,y_sub)
+  if area_ocupada <= A:
+    print("Se ha encontrado la sol óptima con y_punto")
+    return y_sub,area_ocupada
+  else:
+    print("Calcular con Lagrange")
+
+    diferencia = 10
+    lamb = 0
+    area_ocu_op = 0
+
+    while diferencia > error:
+      y_opt = []
+
+      for j in range(0,n):
+        y_optimo =((2*k[j]*D[j])/(h[j]-2*lamb*a[j]))**0.5
+        y_opt.append(y_optimo)
+      area_ocu_op = np.dot(a,y_opt)
+      if area_ocu_op <= A:
+        diferencia = np.abs(A - area_ocu_op)
+        lamb -= 0.001
+      lamb -= 0.001
+    print("La solución óptima es:")
+    return y_opt,area_ocu_op
+
+## dATOS
+k = [10,5,15,6]
+D = [2,4,4,5]
+h = [0.3,0.1,0.2,0.3]
+a = [1,1,1,2]
+n = len(k)
+A = 30
+
+sol_opt,area_ocupada = inv_restriccion_area(k,D,h,a,A,error = 0.1)
+for yi in range(0,n):
+  print(f"El pedido óptimo del artículo {yi + 1} es: {round(sol_opt[yi],2)} unidades")
+print(f"El área total ocupada es {round(area_ocupada,3)} unidades cuadradas y es menor o igual a {A}")
+
+np.dot(a,k)
+
