@@ -1,0 +1,56 @@
+#Cantidad económica de pedido con discontinuidades de precio
+import math
+
+D = 187.5  #Tasa de demanda
+k = 20     # Costo preparacion de pedido
+c1 = 3     # Costo de compra normal
+c2 = 2.50   # Costo de compra con descuento
+h =0.02    # Costo de almacenamiento
+q = 1000  # Tamaño minimo del pedido con descuento
+L =2       # Tiempo de entrega
+
+y_punto = ((2*k*D)/h)**(0.5)
+
+to = (math.sqrt((2 * k * D) / h))/D
+n = math.floor(L / to)
+Le = L - n*to
+y_r = Le * D
+
+TCU= D*c1 + k*D/y_punto + (h*y_punto/2)
+
+def solve_quadratic(a, b, c, threshold):
+    # Calcular el discriminante
+    discriminant = b**2 - 4*c
+    
+    # Verificar si el discriminante es negativo, sin soluciones reales
+    if discriminant < 0:
+        return "No hay soluciones reales"
+    
+    # Calcular las dos posibles soluciones
+    x1 = (-b + math.sqrt(discriminant)) / (2)
+    x2 = (-b - math.sqrt(discriminant)) / (2)
+    
+    # Devolver la solución que sea mayor que el umbral
+    if x1 > y_punto and x2 > y_punto:
+        return max(x1, x2)
+    elif x1 > y_punto:
+        return x1
+    elif x2 > y_punto:
+        return x2
+    else:
+        return "No hay solución mayor que el umbral"
+
+# Ejemplo de uso con los valores proporcionados
+f = 2  # Coeficiente de x^2
+b = ((L*(c2*D-TCU))/h)
+c = (L*k*D/h)
+
+resultado = solve_quadratic(f, b, c, y_punto)
+
+if q > y_punto and q < resultado:
+  y_opt= q
+else:
+  y_opt=y_punto
+
+print(f"Cantidad economica de pedido: {y_opt} ,  con un punto de reorden de {y_r}")
+
